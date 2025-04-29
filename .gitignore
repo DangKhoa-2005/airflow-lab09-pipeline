@@ -18,8 +18,9 @@ venv.bak/
 ENV.bak/
 
 # Docker / Data / Logs
-airflow-db/postgres-data/ # Quy tắc cụ thể hơn cho postgres-data (điều chỉnh nếu đường dẫn khác)
-Exercises/*/downloads/  # <<< Rất quan trọng: Bỏ qua dữ liệu tải về
+airflow-db/postgres-data/
+Exercises/*/downloads/
+Exercises/*/data/       
 *.log
 
 # Secrets / Environment config
