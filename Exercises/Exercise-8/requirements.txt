@@ -1,0 +1,3 @@
+duckdb>=0.9.0 # Sử dụng phiên bản DuckDB tương đối mới
+pandas # Vẫn cần pandas để đọc CSV ban đầu hoặc xử lý kết quả nếu muốn
+pyarrow # Cần thiết để ghi file Parquet

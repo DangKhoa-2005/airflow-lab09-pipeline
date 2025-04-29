@@ -1,0 +1,3 @@
+psycopg2-binary # Hoặc psycopg2 nếu bạn tự cài đặt dependencies hệ thống
+python-dotenv # Để đọc cấu hình DB từ .env (tùy chọn)
+pandas # Dùng pandas để đọc CSV cho tiện

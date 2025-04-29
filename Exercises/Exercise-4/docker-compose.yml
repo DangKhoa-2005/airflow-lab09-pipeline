@@ -1,0 +1,9 @@
+services:
+  run:
+    image: exercise-4 # Tên image đã build
+    command: python main.py # Lệnh chạy script Python
+    # volumes:
+    #   # Mount thư mục hiện tại (Exercise-4) vào /app trong container
+    #   # Điều này cho phép script truy cập thư mục con 'data'
+    #   - .:/app
+    working_dir: /app # Đặt thư mục làm việc bên trong container là /app

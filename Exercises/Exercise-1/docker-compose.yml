@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  test: # Bạn có thể giữ volume ở đây nếu dùng service test cho việc phát triển cục bộ
+    image: "exercise-1"
+    volumes:
+      - .:/app
+    command: python3 -m pytest
+  run: # Service này dùng để chạy code đã build trong image
+    image: "exercise-1"
+    # volumes:  # <-- Xóa hoặc comment dòng này
+    #  - .:/app # <-- và dòng này
+    command: python3 main.py 

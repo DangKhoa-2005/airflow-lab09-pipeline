@@ -1,0 +1,19 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "divvy_trip_duration_suite_v3",
+  "expectations": [
+    {
+      "expectation_type": "expect_column_pair_values_to_be_equal",
+      "kwargs": {
+        "column_A": "start_date",
+        "column_B": "end_date",
+        "mostly": 0.9
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.18.22"
+  }
+}

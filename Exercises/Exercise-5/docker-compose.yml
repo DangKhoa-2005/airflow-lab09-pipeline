@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:13 # Sử dụng image PostgreSQL
+    container_name: ex5_postgres # Đặt tên container
+    environment:
+      # Cấu hình user, password, database cho Postgres
+      # Nên đặt các giá trị này vào file .env để bảo mật hơn
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-mydatabase}
+    ports:
+      - "5435:5432" # Map cổng 5432 của container ra cổng 5435 của máy host
+    volumes:
+      - postgres_data_ex5:/var/lib/postgresql/data # Lưu trữ dữ liệu postgres persistent
+    networks:
+      - data_net_ex5
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-mydatabase}"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+
+  run:
+    image: exercise-5 # Tên image đã build từ Dockerfile của Exercise 5
+    container_name: ex5_run_script
+    command: python main.py # Lệnh chạy script Python
+    environment:
+      # Truyền biến môi trường kết nối DB vào container chạy script
+      # Các biến này sẽ được đọc từ file .env hoặc dùng giá trị mặc định
+      DB_HOST: postgres # Tên service của postgres trong cùng network
+      DB_PORT: 5432 # Cổng nội bộ của postgres
+      DB_NAME: ${POSTGRES_DB:-mydatabase}
+      DB_USER: ${POSTGRES_USER:-user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    # volumes:
+    #   # Mount thư mục hiện tại (Exercise-5) vào /app trong container
+    #   - .:/app
+    working_dir: /app # Đặt thư mục làm việc bên trong container là /app
+    depends_on:
+      postgres:
+        condition: service_healthy # Chỉ chạy khi postgres đã sẵn sàng
+    networks:
+      - data_net_ex5
+
+volumes:
+  postgres_data_ex5: # Đặt tên volume cụ thể
+
+networks:
+  data_net_ex5:
+    driver: bridge

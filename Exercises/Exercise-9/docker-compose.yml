@@ -1,0 +1,16 @@
+services:
+  run:
+    image: exercise-9 # Tên image đã build
+    container_name: ex9_polars_run
+    command: python main.py
+    volumes:
+      # Mount thư mục hiện tại (Exercise-9) vào /app
+      - .:/app
+      # Mount thư mục data chứa file csv
+      - ./data:/app/data:ro # Chỉ cần đọc
+    working_dir: /app
+    # Có thể tăng bộ nhớ nếu file CSV rất lớn
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 4G

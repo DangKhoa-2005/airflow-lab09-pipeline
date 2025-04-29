@@ -1,0 +1,3 @@
+# Cần pyspark để chạy Spark với Python
+pyspark>=3.4.0 # Sử dụng phiên bản PySpark tương đối mới
+pandas # <<< THÊM DÒNG NÀY

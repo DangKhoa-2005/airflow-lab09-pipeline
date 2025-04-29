@@ -1,0 +1,4 @@
+pandas
+# Nâng cấp lên phiên bản 0.18.x ổn định
+great-expectations>=0.18.0,<0.19.0
+pyarrow

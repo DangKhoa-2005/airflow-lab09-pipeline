@@ -1,0 +1,78 @@
+x-airflow-common: &airflow-common
+  # Build từ Dockerfile trong thư mục hiện tại (gốc LAB09)
+  build: .
+  env_file:
+    # Tải biến môi trường từ file .env ở thư mục hiện tại
+    - .env
+  environment:
+    # Cấu hình Airflow dùng SQLite tại đường dẫn đã mount
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:///${AIRFLOW_SQLITE_PATH}
+    AIRFLOW__CORE__EXECUTOR: SequentialExecutor # Dùng SequentialExecutor cho đơn giản
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    # AIRFLOW_UID: ${AIRFLOW_UID:-50000} # Bỏ comment nếu cần set UID khớp với host
+  volumes:
+    # Mount thư mục DAGs từ host vào container
+    - ./dags:/opt/airflow/dags:rw
+    # Mount thư mục chứa database SQLite từ host
+    - ./airflow-db:/opt/airflow-db:rw
+    # Mount thư mục logs từ host
+    - ./logs:/opt/airflow/logs:rw
+    # !!! QUAN TRỌNG: Mount thư mục gốc dự án LAB09 vào container !!!
+    # Điều này cho phép DAG truy cập thư mục Exercises và các file docker-compose con
+    # Đảm bảo đường dẫn nguồn '.' là thư mục gốc LAB09 khi chạy docker-compose
+    - .:/opt/airflow/project:rw
+    # !!! QUAN TRỌNG: Mount Docker socket !!!
+    # Cho phép container Airflow giao tiếp với Docker daemon trên máy host
+    - /var/run/docker.sock:/var/run/docker.sock
+  networks:
+    - lab9_airflow_net
+  # user: "${AIRFLOW_UID:-50000}" # Bỏ comment nếu cần set UID
+
+services:
+  lab9-airflow-init: # Đặt tên riêng cho service init
+    <<: *airflow-common
+    container_name: lab9_airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        echo "Initializing/Upgrading Airflow DB at ${AIRFLOW_SQLITE_PATH}..."
+        # Chạy upgrade, nó sẽ tự init nếu cần
+        airflow db upgrade
+        echo "DB Initialization/Upgrade finished."
+        # Tạo user admin nếu chưa có (cần thiết cho lần chạy đầu)
+        airflow users create \
+          --username admin \
+          --firstname Admin \
+          --lastname User \
+          --role Admin \
+          --email admin@example.com \
+          --password admin || echo "Admin user already exists or creation failed."
+    # Service này chỉ chạy 1 lần rồi thoát, không cần restart
+
+  lab9-airflow-webserver: # Đặt tên riêng
+    <<: *airflow-common
+    container_name: lab9_airflow_webserver
+    command: airflow webserver
+    ports:
+      - "8084:8080" # Dùng cổng khác, ví dụ 8084, để tránh xung đột
+    restart: always # Tự động khởi động lại nếu bị lỗi
+    depends_on:
+      lab9-airflow-init:
+        condition: service_completed_successfully # Chờ init xong
+
+  lab9-airflow-scheduler: # Đặt tên riêng
+    <<: *airflow-common
+    container_name: lab9_airflow_scheduler
+    command: airflow scheduler
+    restart: always # Tự động khởi động lại nếu bị lỗi
+    depends_on:
+      lab9-airflow-init:
+        condition: service_completed_successfully # Chờ init xong
+
+# Không cần volumes riêng cho DB vì đã mount thư mục host
+
+networks:
+  lab9_airflow_net: # Đặt tên riêng cho network
+    driver: bridge
+
