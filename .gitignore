@@ -24,3 +24,4 @@ Exercises/*/downloads/  # <<< Rất quan trọng: Bỏ qua dữ liệu tải v�
 
 # Secrets / Environment config
 # .env # Bỏ comment dòng này nếu bạn không muốn đưa file .env lên repo
+airflow-db/airflow.db
